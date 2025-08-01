@@ -309,15 +309,6 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
               )}
             </div>
           </div>
-
-        {/* Only show START OVER button after payment completion or on error */}
-        {(paymentSuccessful || purchaseError) && (
-          <button 
-            className="start-over-button"
-          >
-            {t('startOver')}
-          </button>
-        )}
         </div>
 
         <div className="cart-sidebar">
