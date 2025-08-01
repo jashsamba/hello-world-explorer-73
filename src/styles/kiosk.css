@@ -1166,15 +1166,34 @@ html, body {
 }
 
 .enter-key {
-  min-width: 150px;
+  width: 250px;  /* Increased width */
+  height: 60px;  /* Increased height */
   background: #28a745;
   color: white;
   border-color: #28a745;
+  border-radius: 15px;  /* More rounded corners */
+  font-weight: bold;
+  font-size: 18px;  /* Larger font */
+  margin: 20px auto 0;  /* Center with top margin */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* Subtle shadow */
 }
 
 .enter-key:hover {
   background: #218838;
   border-color: #218838;
+  transform: scale(1.02);  /* Slight grow effect */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);  /* Enhanced shadow on hover */
+  transition: all 0.2s ease;
+}
+
+.enter-key:active {
+  transform: scale(0.98);  /* Gentler scale effect */
+  background: #1e7e34;
+  border-color: #E53E3E;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .space-key {

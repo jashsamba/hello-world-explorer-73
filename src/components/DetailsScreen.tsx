@@ -53,24 +53,24 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ onContinue, onBack, total
     ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
     ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
     ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-    ['⇧', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '-', '⇧'],
-    ['space', '←', 'Enter']
+    ['⇧', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '⇧'],
+    ['space', '←']
   ];
 
   const emailKeyboardLayout = [
     ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
     ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
     ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-    ['⇧', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '-', '⇧'],
-    ['@', '.', 'space', '←', 'Enter'],
-    ['@gmail.com', '@outlook.com', '@yahoo.com', '@hotmail.com','.com']
+    ['⇧', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '@', '.'],
+    ['space', '←'],
+    ['@gmail.com', '@outlook.com', '@yahoo.com', '@hotmail.com']
   ];
 
   const postalCodeKeyboardLayout = [
     ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-    ['z', 'x', 'c', 'v', 'b', 'n', 'm', '←', 'Enter']
+    ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'],
+    ['k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'],
+    ['u', 'v', 'w', 'x', 'y', 'z', '←']
   ];
 
   const getCurrentKeyboardLayout = () => {
@@ -245,44 +245,43 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ onContinue, onBack, total
   const addOnItems = [
     { id: 'donation-10', name: t('donation10'), price: 10.00 },
     { id: 'donation-15', name: t('donation15'), price: 15.00 },
-    { id: 'donation-25', name: t('donation25'), price: 25.00 },
-    { id: 'field-trip', name: t('fieldTripDonation'), price: 300.00 }
+    { id: 'donation-25', name: t('donation25'), price: 25.00 }
   ];
 
-  // Generate dynamic cart items based on current selections
+  // Generate cart items for display
   const generateCartItems = () => {
     const cartItems = [];
-    
-    // Add selected tickets
-    tickets.forEach(ticket => {
+
+    // Add tickets to cart
+    for (const ticket of tickets) {
       const quantity = quantities[ticket.id] || 0;
       if (quantity > 0) {
         cartItems.push({
           id: ticket.id,
-          icon: '🎫',
           name: ticket.name,
-          description: `${ticket.name} (${quantity})`,
-          price: (quantity * ticket.price).toFixed(2),
-          quantity
+          price: ticket.price,
+          quantity,
+          icon: '🎟️',
+          description: `$${ticket.price.toFixed(2)} ${t('each')}`
         });
       }
-    });
-    
-    // Add selected add-ons
-    addOnItems.forEach(addOn => {
+    }
+
+    // Add add-ons to cart
+    for (const addOn of addOnItems) {
       const quantity = addOns[addOn.id] || 0;
       if (quantity > 0) {
         cartItems.push({
           id: addOn.id,
-          icon: '🎁',
           name: addOn.name,
-          description: `${addOn.name} (${quantity})`,
-          price: (quantity * addOn.price).toFixed(2),
-          quantity
+          price: addOn.price,
+          quantity,
+          icon: '🎁',
+          description: `$${addOn.price.toFixed(2)} ${t('each')}`
         });
       }
-    });
-    
+    }
+
     return cartItems;
   };
 
@@ -370,7 +369,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ onContinue, onBack, total
             </button>
           </div>
 
-          {showKeyboard && (
+          {showKeyboard &&
             <div className="keyboard-overlay">
               <div className="virtual-keyboard">
                 <div className="keyboard-header">
@@ -411,28 +410,32 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ onContinue, onBack, total
                   <div key={rowIndex} className="keyboard-row">
                     {row.map((key, keyIndex) => (
                       <button
-                        key={keyIndex}
-                        className={`keyboard-key ${key.startsWith('@') || key === '.com' ? 'email-domain-key' : ''} ${key === 'space' ? 'space-key' : ''}`}
+                        key={`${rowIndex}-${keyIndex}`}
+                        className={`keyboard-key ${
+                          key === 'space' ? 'space-key' :
+                          key === 'Enter' ? 'enter-key' :
+                          key.startsWith('@') ? 'email-domain-key' : ''
+                        }`}
                         onClick={() => handleKeyPress(key)}
-                        disabled={isProcessing}
+                        data-key={key}
                       >
-                        {key === 'space' ? 'SPACE' : key}
+                        {key === 'space' ? 'Space' :
+                         key === '←' ? '⌫' :
+                         key}
                       </button>
                     ))}
                   </div>
                 ))}
-                <div className="keyboard-row">
-                  <button
-                    className="keyboard-key enter-key"
-                    onClick={() => handleKeyPress('Enter')}
-                    disabled={isProcessing}
-                  >
-                    Enter
-                  </button>
-                </div>
+
+                <button
+                  className="enter-key"
+                  onClick={() => handleKeyPress('Enter')}
+                >
+                  Enter
+                </button>
               </div>
             </div>
-          )}
+          }
         </div>
 
         <div className="cart-sidebar">
@@ -469,15 +472,15 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ onContinue, onBack, total
           <div className="cart-summary">
             <div className="summary-line">
               <span>{t('subtotal')}</span>
-              <span>${totals?.subtotal || '0.00'}</span>
+              <span>${totals?.subtotal}</span>
             </div>
             <div className="summary-line">
               <span>{t('selectedTax')}</span>
-              <span>${totals?.tax || '0.00'}</span>
+              <span>${totals?.tax}</span>
             </div>
             <div className="summary-line total">
               <span>{t('totalIncTax')}</span>
-              <span>${totals?.total || '0.00'}</span>
+              <span>${totals?.total}</span>
             </div>
           </div>
         </div>
