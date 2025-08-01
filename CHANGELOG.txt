@@ -1,0 +1,282 @@
+KIOSK PROJECT - CHANGE LOG
+==========================
+
+Last Updated: 2025-07-31 20:42:45 EST (Auto-Advance Form Navigation)
+
+CURRENT SESSION CHANGES:
+-----------------------
+
+- Auto-Advance Form Navigation Implementation (2025-07-31 20:42:45 EST):
+  * Added auto-advance functionality to details form for streamlined kiosk experience
+  * Implemented Enter key on all virtual keyboard layouts (name, email, postal code)
+  * Created advanceToNextField() function with sequential field progression logic
+  * Field sequence: firstName → lastName → email → postalCode → Continue button
+  * Updated Enter key handler to auto-advance instead of closing keyboard
+  * Added distinctive blue styling for Enter keys (professional appearance)
+  * Enhanced user experience: no manual field clicking required
+  * Faster form completion for standing kiosk users
+  * Added translation keys for enhanced UX in both English and French
+  * Enter key auto-focuses next field and keeps keyboard open for continuous typing
+  * Final postal code Enter closes keyboard and focuses Continue button
+  * Improved accessibility and reduced touch interactions needed
+
+- Ticket Selection Screen Layout Optimization (2025-07-31 20:30:00 EST):
+  * Eliminated vertical scrolling on ticket/add-on selection screen
+  * Changed "Select Add-ons" title to "Donate to THEMUSEUM today" for clearer call-to-action
+  * Moved red M logo from main content area to bottom-right corner (fixed positioning)
+  * Removed non-functional red "DONATE" button decorative element
+  * Removed duplicate cart total section from bottom (already shown in sidebar)
+  * Added new translation keys for donation section title in English and French
+  * Optimized screen real estate usage for better kiosk interface experience
+  * Scaled and positioned bottom-right logo at 70% size with 80% opacity
+  * Layout changes result in streamlined, scrolling-free ticket selection interface
+  * All content now fits within single screen view without vertical scrolling required
+
+- Zoom Lock & Kiosk Display Optimization (2025-07-31 20:00:00 EST):
+  * Fixed kiosk interface not fitting properly on display screens
+  * Implemented comprehensive zoom prevention for kiosk environments
+  * Updated viewport meta tag with user-scalable=no and locked zoom levels
+  * Added CSS zoom prevention: disabled user selection, touch callouts, and zoom gestures
+  * Set fixed transform scale(1) to prevent any scaling modifications
+  * Added touch-action: manipulation to prevent zoom gestures on touch devices
+  * Implemented overflow: hidden on html/body to contain content within screen bounds
+  * Removed ability for users to accidentally zoom interface via pinch or double-tap
+  * Enhanced kiosk experience by ensuring interface always fits screen perfectly
+  * Eliminated need for users to scroll or pan around the interface
+  * Solution addresses the specific kiosk display issue where content was too large for screen
+
+- Complete French Translation Implementation (2025-07-31):
+  * Fixed all hardcoded English text in donation sections across all components
+  * Added missing translation keys: donation15, fieldTripDonation, donationAddOn, donationDescription, donationTaxInfo
+  * Updated TicketSelectionScreen.tsx to use translation keys for all donation text
+  * Updated DetailsScreen.tsx to use translation keys for all donation items
+  * Updated CheckoutScreen.tsx to use translation keys for all donation items
+  * Implemented language-aware date/time formatting (fr-CA for French, en-US for English)
+  * Fixed donation section header "DONATION ADD-ON" → "SUPPLÉMENT DE DON" in French
+  * Fixed donation descriptions and tax information to translate properly
+  * Added French translations for $15 donation and field trip donation options
+  * All text now properly switches to French when language selector is changed
+  * Date and time displays now show in appropriate locale format
+
+- Rate Limit Fix & Client Delivery Optimizations (2025-07-27 14:54:00 EDT):
+  * Fixed rate limit errors on virtual keyboard with 150ms debouncing
+  * Added isProcessing state to prevent rapid keyboard clicks
+  * Disabled keyboard buttons during processing to provide visual feedback
+  * Synced addOnItems across all screens (CheckoutScreen, DetailsScreen, TicketSelectionScreen)
+  * Fixed $300 field trip donation pricing consistency across all screens
+  * Added missing translation keys: ticketDescription, processing, retry, securingPurchase
+  * Fixed postal code format inconsistency (A1A vs A1A1A1) in translations
+  * Removed unused translation keys: donation5, fieldTrip, busSubsidy
+  * Updated ticketDescription to be kiosk-appropriate text
+  * Added ticketDescription display to TicketSelectionScreen
+  * Enhanced email @ symbol validation with flicker error effects
+  * Verified complete user flow: Landing → Tickets → Details → Checkout → Completion
+  * Updated buy-tickets-button styling (red background, white text)
+  * Added logo integration across all headers (replaced text with logo.png)
+  * Removed "Edit" buttons from cart sidebars for cleaner UX
+  * Fixed keyboard layouts for different fields (name, email, postal code)
+  * Added firstName and lastName fields to details form
+  * Updated postal code validation to 3-digit Canadian format (A1A)
+  * All builds successful with no compilation errors
+  * System is now CLIENT-READY for deployment
+
+- Codebase Updates, Optimizations, and Security Improvements (2025-07-19 20:00:00 UTC):
+  * Fixed TypeScript errors by replacing 'any' with specific types in multiple components
+  * Removed duplicate config file (services.ts) and consolidated in utils.ts
+  * Moved sensitive keys to environment variables for security
+  * Updated all dependencies to latest versions via npm update
+  * Added React.memo to key components for render optimization
+  * Fixed linter warnings and errors
+
+- Child Ticket Age Range Enhancement (2025-01-28):
+  * Added plus sign (+) to child ticket age range in TicketSelectionScreen
+  * Updated English translation: "Child General Admission (4-17+)"
+  * Updated French translation: "Admission Générale Enfant (4-17+)"
+  * Modified LanguageContext.tsx to reflect the change across all screens
+  * This clarifies that children 17 years old and above can use child tickets
+
+- Donation Section Updates (2025-07-19):
+  * Updated donation amounts in TicketSelectionScreen to match business requirements
+  * Changed donation options to: $10, $15, $25 (standard donations) + $300 (field trip option)
+  * Maintained all existing functionality while updating display amounts
+  * Enhanced donation display format to match provided design specifications
+
+- Updated timestamp format to include seconds-level precision (16:15:47 UTC)
+- Implemented Phase 1 animation enhancements:
+  * Enhanced design system with animation tokens (transitions, shadows, gradients)
+  * Added micro-interaction animations (ripple, shake, number-pop, card-hover)
+  * Enhanced Button component with kiosk variant and improved hover effects
+  * Updated Card component with hover-lift animations
+  * Enhanced EnhancedQuantityControl with button press feedback and spring animations
+  * Added utility classes for hover effects and smooth transitions
+
+- Enhanced Postal Code Validation with Flicker Animation:
+  * Enforced Canadian postal code format (A1A 1A1) with position-based validation
+  * Added flicker animation when user types wrong character at wrong position
+  * Enhanced format validation to ensure letters at positions 0,2,5 and numbers at 1,4,6
+  * Auto-insert space after 3rd character for proper formatting
+  * Updated placeholders and labels to show A1A 1A1 format
+
+- N8N Email Integration for Receipt Automation:
+  * Added "Send Receipt" button in CheckoutScreen during payment processing
+  * Integrated email extraction from DetailsScreen for automated workflow
+  * Implemented one-time usage with button state management (disabled after sending)
+  * Added success/error feedback with visual states (sending spinner, sent checkmark)
+  * Connected to N8N webhook for email automation workflow
+  * Enhanced button styling with hover effects and state transitions
+
+- Complete Language Support Implementation (French/English):
+  * Made ALL pages fully responsive to language selector button
+  * Added comprehensive translations for all hardcoded text across entire application
+  * Enhanced translation context with missing keys for navigation, forms, and messages
+  * Updated all back buttons to show translated text (← Main Screen / ← Écran Principal)
+  * Added language support for email automation button states
+  * Implemented full translation for postal code validation and keyboard instructions
+  * Enhanced form field labels and placeholders with proper translations
+
+- Live System Time Implementation:
+  * Added real-time clock display across all screens (TicketSelection, Details, Checkout)
+  * Implemented automatic time updates every second using useEffect timers
+  * Consistent time format: "11:00AM | September 23, 2025" across all pages
+  * Replaced static time displays with dynamic system time in all components
+
+1. COMPLETION SCREEN ENHANCEMENTS (2025-07-14)
+   - Centered completion message and button on the page
+   - Changed "Start New Purchase" button to white background with red text/border
+   - Added fadeInUp animation for smooth entrance effect
+   - Implemented buttonPulse animation (continuous scaling like landing page)
+   - Enhanced hover effects with transform and shadow animations
+   - Improved overall visual consistency with landing page design
+
+2. VIRTUAL KEYBOARD IMPROVEMENTS (2025-07-14)
+   - Added large typing display window above keyboard
+   - Shows real-time preview of typed email with blinking cursor
+   - Reduced cursor spacing for better visual flow
+   - Enhanced keyboard overlay with backdrop blur effect
+   - Improved user experience for email input
+
+3. POSTAL CODE KEYBOARD FIXES (2025-07-14)
+   - Fixed space button not working in postal code input field
+   - Removed 3-character space auto-formatting restriction
+   - Updated postal code to accept any 6 alphanumeric characters
+   - Simplified postal code validation from Canadian A1A 1A1 format to simple 6-character requirement
+   - Removed space key from postal code virtual keyboard layout
+   - Updated all postal code labels and placeholders to reflect 6-character format
+
+4. CART SYNCHRONIZATION FIXES (2025-07-14)
+   - Fixed cart state persistence across navigation
+   - Moved cart state management from TicketSelectionScreen to KioskInterface
+   - Ensured cart selections survive page transitions
+   - Synchronized cart display between DetailsScreen and CheckoutScreen
+   - Added complete donation options to all cart displays
+   - Fixed cart item generation to include all add-ons (donations, field trip, bus subsidy)
+
+5. NAVIGATION FIXES (2025-07-14)
+   - Fixed back button labels to show previous page name instead of current page
+   - Updated TicketSelectionScreen back button: "← Main Screen"
+   - Updated DetailsScreen back button: "← Checkout"  
+   - Updated CheckoutScreen back button: "← Details"
+
+6. DETAILS SCREEN SIMPLIFICATION (2025-07-14)
+   - Removed first name field (not required)
+   - Removed last name field (not required)
+   - Removed contact number field (not required)
+   - Removed postal code field
+   - Removed discount code section
+   - Removed email offers checkbox
+   - Removed terms and conditions checkbox
+   - Simplified to only email address field (required)
+   - Enhanced virtual keyboard with email domain shortcuts
+   - Added @gmail.com, @outlook.com, @yahoo.com, @hotmail.com quick buttons
+   - Implemented keyboard overlay with background blur
+   - Added Enter key to close keyboard
+   - Enhanced email validation (must contain @ and .)
+
+PREVIOUS SESSION CHANGES:
+------------------------
+
+6. DYNAMIC CART IMPLEMENTATION (Previous)
+   - Cart items now reflect actual ticket and add-on selections
+   - Cart header shows accurate item count (0 items, 1 item, 2+ items)
+   - Empty cart state with friendly message when no selections made
+   - Individual cart items display correct names, quantities, and line totals
+   - Added language support for new cart states
+   - Enhanced cart styling for empty state with proper visual feedback
+
+7. VISUAL ENHANCEMENTS (Previous)
+   - Added smooth screen transitions with fade effects
+   - Implemented button hover animations and loading states
+   - Created progress indicator component for 5-step flow
+   - Enhanced quantity controls with better UX
+   - Added gradient backgrounds and modern styling
+
+8. LANGUAGE SUPPORT (Previous)
+   - Added bilingual support (English/French)
+   - Created language selector always visible in top-right corner
+   - Implemented LanguageContext for state management
+   - Translated all UI text and labels
+
+9. LAYOUT FIXES (Previous)
+   - Fixed time display overlap with language selector
+   - Centered "Start New Purchase" button on completion screen
+   - Improved responsive positioning for mobile devices
+   - Enhanced header layout with proper spacing
+
+10. CORE FEATURES (Previous)
+   - 5-step kiosk flow: Landing → Ticket Selection → Details → Checkout → Completion
+   - Supabase integration for data persistence
+   - Responsive design with mobile support
+   - Progress tracking through steps
+
+FILES MODIFIED IN CURRENT SESSION:
+----------------------------------
+- index.html (viewport zoom lock configuration)
+- src/styles/kiosk.css (comprehensive zoom prevention CSS)
+- src/contexts/LanguageContext.tsx (missing translation keys added)
+- src/components/TicketSelectionScreen.tsx (translation fixes, date localization)
+- src/components/DetailsScreen.tsx (translation fixes, date localization)
+- src/components/CheckoutScreen.tsx (translation fixes, date localization)
+- CHANGELOG.txt (current session documentation)
+
+FILES MODIFIED IN PREVIOUS SESSIONS:
+-----------------------------------
+- src/contexts/LanguageContext.tsx (comprehensive translation enhancements)
+- src/components/DetailsScreen.tsx (live time, language support, postal code validation)
+- src/components/CheckoutScreen.tsx (live time, language support, N8N integration)
+- src/components/TicketSelectionScreen.tsx (live time, language support)
+- src/components/CompletionScreen.tsx (layout restructure, button styling)
+- src/components/KioskInterface.tsx (cart state management, email flow)
+- src/components/ui/button.tsx (kiosk variant, enhanced animations)
+- src/components/ui/card.tsx (hover animations)
+- src/components/EnhancedQuantityControl.tsx (button press feedback)
+- src/index.css (animation system, flicker effects, button styling)
+- src/styles/kiosk.css (completion screen animations, keyboard overlay styling)
+
+FILES MODIFIED IN PREVIOUS SESSIONS:
+-----------------------------------
+- src/index.css (design tokens and animations)
+- src/components/ProgressIndicator.tsx (new)
+- src/components/LanguageSelector.tsx (new)
+- src/contexts/LanguageContext.tsx (new)
+- src/components/LandingScreen.tsx
+- src/components/CompletionScreen.tsx
+- src/components/EnhancedQuantityControl.tsx (new)
+- src/main.tsx
+
+GIT SYNC STATUS:
+---------------
+✓ All changes automatically synced to GitHub via Lovable's bidirectional sync
+✓ Real-time synchronization enabled
+✓ No manual push required
+
+NEXT POTENTIAL IMPROVEMENTS:
+---------------------------
+- Payment integration enhancements
+- Additional accessibility features
+- Advanced analytics integration
+- Custom theming options
+- Enhanced error handling
+
+- Updated French Age Ranges (2025-07-19 20:10:36 UTC):
+  * Changed adult to (13+) and child to (4-12) in French translations to match English
+  * Modified src/contexts/LanguageContext.tsx lines 139-140
