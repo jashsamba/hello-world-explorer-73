@@ -1,10 +1,18 @@
 KIOSK PROJECT - CHANGE LOG
 ==========================
 
-Last Updated: 2025-07-31 20:42:45 EST (Auto-Advance Form Navigation)
+Last Updated: 2025-07-31 21:35:23 EST (START OVER Button Update)
 
 CURRENT SESSION CHANGES:
 -----------------------
+
+- START OVER Button Update (2025-07-31 21:35:23 EST):
+  * Removed unnecessary hover effects from START OVER button
+  * Removed cursor pointer since button is not interactive
+  * Removed hover transform and shadow effects
+  * Simplified background to solid white
+  * Maintained base styling and pulsing animation
+  * Improved user experience by removing misleading interactive states
 
 - Auto-Advance Form Navigation Implementation (2025-07-31 20:42:45 EST):
   * Added auto-advance functionality to details form for streamlined kiosk experience
