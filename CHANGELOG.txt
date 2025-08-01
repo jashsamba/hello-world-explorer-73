@@ -1,10 +1,17 @@
 KIOSK PROJECT - CHANGE LOG
 ==========================
 
-Last Updated: 2025-07-31 21:35:23 EST (START OVER Button Update)
+Last Updated: 2025-07-31 21:39:06 EST (START OVER Button Visibility Fix)
 
 CURRENT SESSION CHANGES:
 -----------------------
+
+- START OVER Button Visibility Fix (2025-07-31 21:39:06 EST):
+  * Modified START OVER button visibility on payment screen
+  * Now only shows after payment completion or on payment error
+  * Removed button during active payment processing
+  * Improved user experience by hiding non-relevant controls
+  * Cleaner interface during payment process
 
 - START OVER Button Update (2025-07-31 21:35:23 EST):
   * Removed unnecessary hover effects from START OVER button
