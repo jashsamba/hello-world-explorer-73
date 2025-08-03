@@ -166,7 +166,7 @@ const TicketSelectionScreen: React.FC<TicketSelectionScreenProps> = ({
               <div key={ticket.id} className="ticket-item">
                 <div className="ticket-details">
                   <div className="ticket-name">{ticket.name}</div>
-                  <div className="ticket-price">${ticket.price}</div>
+                  <div className="ticket-price">${ticket.price.toFixed(2)}</div>
                 </div>
                 <EnhancedQuantityControl
                   quantity={quantities[ticket.id] || 0}
@@ -229,7 +229,7 @@ const TicketSelectionScreen: React.FC<TicketSelectionScreenProps> = ({
                     <div>{item.name}</div>
                     <div>{item.description}</div>
                   </div>
-                  <div className="item-price">${item.price}</div>
+                  <div className="item-price">${Number(item.price).toFixed(2)}</div>
                 </div>
               ))
             )}
@@ -238,15 +238,15 @@ const TicketSelectionScreen: React.FC<TicketSelectionScreenProps> = ({
           <div className="cart-summary">
             <div className="summary-line">
               <span>{t('subtotal')}</span>
-              <span>${totals.subtotal}</span>
+              <span>${Number(totals.subtotal).toFixed(2)}</span>
             </div>
             <div className="summary-line">
               <span>{t('selectedTax')}</span>
-              <span>${totals.tax}</span>
+              <span>${Number(totals.tax).toFixed(2)}</span>
             </div>
             <div className="summary-line total">
               <span>{t('totalIncTax')}</span>
-              <span>${totals.total}</span>
+              <span>${Number(totals.total).toFixed(2)}</span>
             </div>
           </div>
 
@@ -262,8 +262,17 @@ const TicketSelectionScreen: React.FC<TicketSelectionScreenProps> = ({
         {/* Museum logo positioned in bottom right */}
         <div className="museum-logo-bottom-right">
           <div className="museum-logo-box">
-            <span className="museum-logo-text">M</span>
-            <span className="museum-subtitle">THEMUSEUM</span>
+            <img 
+              src="/logo.png" 
+              alt="THEMUSEUM"
+              style={{
+                width: '100%',
+                height: 'auto',
+                maxWidth: '120px',
+                display: 'block',
+                margin: '0 auto'
+              }}
+            />
           </div>
         </div>
       </div>

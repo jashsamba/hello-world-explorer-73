@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useSecurePurchase } from '../hooks/useSecurePurchase';
+import { kioskPayment } from '../services/kioskPayment';
+import type { PaymentResponse } from '../types/kiosk';
 
 interface CheckoutScreenProps {
   onComplete: () => void;
@@ -31,13 +32,14 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
   userDetails 
 }) => {
   const { t, language } = useLanguage();
-  const { processPurchase, processing: purchaseProcessing } = useSecurePurchase();
   const [processing, setProcessing] = useState(false);
   const [paymentSuccessful, setPaymentSuccessful] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
+  const [activeKiosk, setActiveKiosk] = useState<'KIOSK1' | 'KIOSK2'>('KIOSK1');
+  const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
 
   // Update time every second
   useEffect(() => {
@@ -48,7 +50,15 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
     return () => clearInterval(timer);
   }, []);
 
-  // Format time as "11:00AM | September 23, 2025"
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (currentTransactionId) {
+        kioskPayment.cancelPayment(currentTransactionId, activeKiosk).catch(console.error);
+      }
+    };
+  }, [currentTransactionId, activeKiosk]);
+
   const formatDateTime = (date: Date) => {
     const locale = language === 'fr' ? 'fr-CA' : 'en-US';
     const timeString = date.toLocaleTimeString(locale, { 
@@ -64,7 +74,6 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
     return `${timeString} | ${dateString}`;
   };
 
-  // Define ticket and add-on items (same as TicketSelectionScreen)
   const tickets = [
     { id: 'adult-general', name: t('adultGeneral'), price: 19.99 },
     { id: 'child-general', name: t('childGeneral'), price: 14.99 },
@@ -79,11 +88,9 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
     { id: 'field-trip', name: t('fieldTripDonation'), price: 300.00 }
   ];
 
-  // Generate dynamic cart items based on current selections
   const generateCartItems = () => {
     const cartItems = [];
     
-    // Add selected tickets
     tickets.forEach(ticket => {
       const quantity = quantities[ticket.id] || 0;
       if (quantity > 0) {
@@ -98,7 +105,6 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
       }
     });
     
-    // Add selected add-ons
     addOnItems.forEach(addOn => {
       const quantity = addOns[addOn.id] || 0;
       if (quantity > 0) {
@@ -120,54 +126,68 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
   const totalItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleSecurePurchase = async () => {
-    // TODO: Re-enable validation when customer details are properly implemented
-    // if (!userEmail || !userDetails) {
-    //   setPurchaseError('Missing required customer information');
-    //   return;
-    // }
-
     try {
       setPurchaseError(null);
-      
-      // For now, just simulate successful payment
-      setPaymentSuccessful(true);
-      console.log('Payment simulation completed successfully');
-      
-      // Auto-advance to completion after successful payment
-      setTimeout(() => {
-        onComplete();
-      }, 2000);
-      
-      // TODO: Implement actual secure purchase when customer details are ready
-      /*
-      const purchaseData = {
-        first_name: userDetails?.firstName || 'Guest',
-        last_name: userDetails?.lastName || 'User', 
-        email: userEmail || 'guest@example.com',
-        contact_number: userDetails?.contactNumber,
-        postal_code: userDetails?.postalCode,
-        tickets: quantities,
-        add_ons: addOns,
-        totals: totals,
+      setProcessing(true);
+
+      const paymentRequest = {
+        amount: totals.total,
+        currency: 'CAD',
+        orderId: `order-${Date.now()}`,
+        kioskId: activeKiosk,
+        items: cartItems.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: Number(item.price)
+        }))
       };
 
-      const result = await processPurchase(purchaseData);
-      
+      const result = await kioskPayment.initiatePayment(paymentRequest);
+      setCurrentTransactionId(result.transactionId || null);
+
       if (result.success) {
         setPaymentSuccessful(true);
-        console.log('Purchase completed successfully:', result.purchase_id);
+        console.log('Payment completed successfully:', result.transactionId);
         
         setTimeout(() => {
           onComplete();
         }, 2000);
       } else {
-        setPurchaseError(result.error || 'Purchase failed');
-        console.error('Purchase failed:', result.error, result.details);
+        setPurchaseError(result.error || 'Payment failed');
+        console.error('Payment failed:', result.error, result.details);
+        
+        // Try fallback to other kiosk
+        if (activeKiosk === 'KIOSK1') {
+          setActiveKiosk('KIOSK2');
+          // Retry with KIOSK2
+          const fallbackResult = await kioskPayment.initiatePayment({
+            ...paymentRequest,
+            kioskId: 'KIOSK2'
+          });
+          handlePaymentResult(fallbackResult);
+        }
       }
-      */
     } catch (error) {
-      console.error('Purchase processing error:', error);
+      console.error('Payment processing error:', error);
       setPurchaseError('Network error. Please try again.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handlePaymentResult = (result: PaymentResponse) => {
+    setCurrentTransactionId(result.transactionId || null);
+    
+    if (result.success) {
+      setPaymentSuccessful(true);
+      console.log('Payment completed successfully:', result.transactionId);
+      
+      setTimeout(() => {
+        onComplete();
+      }, 2000);
+    } else {
+      setPurchaseError(result.error || 'Payment failed');
+      console.error('Payment failed:', result.error, result.details);
     }
   };
 
@@ -201,19 +221,19 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
     }
   };
 
-  useEffect(() => {
-    // Simulate payment processing, then trigger secure purchase
-    const timer = setTimeout(() => {
+  // Test mode controls
+  const handleTestModeNext = () => {
+    if (processing) {
+      setProcessing(false);
+      handleSecurePurchase();
+    } else if (!paymentSuccessful) {
       setProcessing(true);
-      // After 3 seconds, trigger the secure purchase process
       setTimeout(() => {
         setProcessing(false);
         handleSecurePurchase();
-      }, 3000);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
+      }, 1000);
+    }
+  };
 
   return (
     <div className="screen-container">
@@ -233,7 +253,7 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
           <div className="payment-terminal">
             <div className="payment-amount">
               <span className="payment-label">{t('cardPayment')}</span>
-              <span className="payment-total">${totals.total}</span>
+              <span className="payment-total">${totals.total.toFixed(2)}</span>
             </div>
             
             <div className="terminal-icon">
@@ -271,9 +291,8 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
                       setPurchaseError(null);
                       handleSecurePurchase();
                     }}
-                    disabled={purchaseProcessing}
                   >
-                    {purchaseProcessing ? t('processing') : t('retry')}
+                    {processing ? t('processing') : t('retry')}
                   </button>
                 </div>
               ) : paymentSuccessful ? (
@@ -299,13 +318,40 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
                     </button>
                   )}
                 </div>
-              ) : processing || purchaseProcessing ? (
+              ) : processing ? (
                 <div className="processing-message">
                   <div className="spinner"></div>
-                  <p>{processing ? t('processingPayment') : t('securingPurchase')}</p>
+                  <p>{t('processingPayment')}</p>
                 </div>
               ) : (
                 <p>{t('pinPadInstructions')}</p>
+              )}
+
+              {/* Test Mode Controls */}
+              {import.meta.env.VITE_KIOSK_TEST_MODE === 'true' && (
+                <div className="test-controls">
+                  <button
+                    onClick={handleTestModeNext}
+                    className="move-next-button"
+                  >
+                    <span>Move to Next Step</span>
+                    <span className="arrow">→</span>
+                  </button>
+                  <div className="kiosk-status">
+                    <div className={`kiosk-indicator ${activeKiosk === 'KIOSK1' ? 'active' : ''}`}>
+                      Kiosk 1 {activeKiosk === 'KIOSK1' && '(Active)'}
+                    </div>
+                    <div className={`kiosk-indicator ${activeKiosk === 'KIOSK2' ? 'active' : ''}`}>
+                      Kiosk 2 {activeKiosk === 'KIOSK2' && '(Active)'}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setActiveKiosk(activeKiosk === 'KIOSK1' ? 'KIOSK2' : 'KIOSK1')}
+                    className="kiosk-switch-button"
+                  >
+                    Switch Kiosk
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -335,9 +381,8 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
                   <div className="item-details">
                     <div>{item.name}</div>
                     <div>{item.description}</div>
-                    <button className="edit-button">{t('edit')}</button>
                   </div>
-                  <div className="item-price">${item.price}</div>
+                  <div className="item-price">${Number(item.price).toFixed(2)}</div>
                 </div>
               ))
             )}
@@ -346,15 +391,15 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
           <div className="cart-summary">
             <div className="summary-line">
               <span>{t('subtotal')}</span>
-              <span>${totals?.subtotal || '0.00'}</span>
+              <span>${(totals?.subtotal || 0).toFixed(2)}</span>
             </div>
             <div className="summary-line">
               <span>{t('selectedTax')}</span>
-              <span>${totals?.tax || '0.00'}</span>
+              <span>${(totals?.tax || 0).toFixed(2)}</span>
             </div>
             <div className="summary-line total">
               <span>{t('totalIncTax')}</span>
-              <span>${totals?.total || '0.00'}</span>
+              <span>${(totals?.total || 0).toFixed(2)}</span>
             </div>
           </div>
         </div>

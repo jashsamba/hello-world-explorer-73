@@ -29,10 +29,14 @@ git clone <YOUR_GIT_URL>
 # Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
+# Step 3: Set up your environment configuration
+cp .env.example .env
+# Edit .env with your actual configuration values
+
+# Step 4: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 5: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
@@ -49,6 +53,37 @@ npm run dev
 - Select the "Codespaces" tab.
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
+
+## Environment Configuration
+
+This project uses environment variables for configuration. To set up your environment:
+
+1. Copy `.env.example` to `.env`:
+   ```sh
+   cp .env.example .env
+   ```
+
+2. Edit `.env` with your actual configuration values:
+   - Kiosk API credentials
+   - API endpoints
+   - Security settings
+   - Feature flags
+   - Monitoring configuration
+
+### Important Environment Variables
+
+- `VITE_KIOSK1_CLIENT_NAME`, `VITE_KIOSK2_CLIENT_NAME`: Names for each kiosk
+- `VITE_KIOSK1_CLIENT_ID`, `VITE_KIOSK2_CLIENT_ID`: Client IDs for API authentication
+- `VITE_KIOSK1_SECRET`, `VITE_KIOSK2_SECRET`: Secret keys for API authentication
+- `VITE_API_BASE_URL`: Base URL for the kiosk payment API
+- `VITE_KIOSK_TEST_MODE`: Enable test mode for development (set to `false` in production)
+
+### Security Notes
+
+- Never commit `.env` to version control
+- Keep your API secrets secure
+- Rotate secrets regularly
+- Use different credentials for development and production
 
 ## What technologies are used for this project?
 

@@ -2,6 +2,112 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Gill Sans MT Pro Font Faces */
+@font-face {
+  font-family: 'Gill Sans MT Pro';
+  src: url('./fonts/GillSansMTPro-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gill Sans MT Pro';
+  src: url('./fonts/GillSansMTPro-LightItalic.otf') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gill Sans MT Pro';
+  src: url('./fonts/GillSansMTPro-Book.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gill Sans MT Pro';
+  src: url('./fonts/GillSansMTPro-BookItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gill Sans MT Pro';
+  src: url('./fonts/GillSansMTPro-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gill Sans MT Pro';
+  src: url('./fonts/GillSansMTPro-MediumItalic.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gill Sans MT Pro';
+  src: url('./fonts/GillSansMTPro-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gill Sans MT Pro';
+  src: url('./fonts/GillSansMTPro-BoldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gill Sans MT Pro';
+  src: url('./fonts/GillSansMTPro-Heavy.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gill Sans MT Pro';
+  src: url('./fonts/GillSansMTPro-HeavyItalic.otf') format('opentype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Condensed variants */
+@font-face {
+  font-family: 'Gill Sans MT Pro Condensed';
+  src: url('./fonts/GillSansMTPro-Condensed.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gill Sans MT Pro Condensed';
+  src: url('./fonts/GillSansMTPro-BoldCondensed.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gill Sans MT Pro Condensed';
+  src: url('./fonts/GillSansMTPro-UltraBoldCond.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Enhanced animations for kiosk interface */
 @keyframes slideInFromRight {
   from {
