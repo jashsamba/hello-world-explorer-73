@@ -9,7 +9,6 @@ class KioskPaymentService {
   private readonly API_RETRY_DELAY = 1000; // 1 second
 
   private kiosk1Config: KioskConfig;
-  private kiosk2Config: KioskConfig;
   private baseUrl: string;
   private testMode: boolean;
 
@@ -26,13 +25,6 @@ class KioskPaymentService {
       secret: import.meta.env.VITE_KIOSK1_SECRET
     };
 
-    this.kiosk2Config = {
-      clientName: import.meta.env.VITE_KIOSK2_CLIENT_NAME,
-      venueName: import.meta.env.VITE_KIOSK2_VENUE_NAME,
-      clientId: import.meta.env.VITE_KIOSK2_CLIENT_ID,
-      secret: import.meta.env.VITE_KIOSK2_SECRET
-    };
-
     this.baseUrl = import.meta.env.VITE_KIOSK_API_URL || 'https://api.kioskpayment.com/v1';
     this.testMode = import.meta.env.VITE_KIOSK_TEST_MODE === 'true';
 
@@ -41,7 +33,8 @@ class KioskPaymentService {
   }
 
   private getConfigForKiosk(kioskId: KioskId): KioskConfig {
-    return kioskId === 'KIOSK1' ? this.kiosk1Config : this.kiosk2Config;
+    // Single-kiosk mode: always use Kiosk 1 configuration
+    return this.kiosk1Config;
   }
 
   private async getAuthHeaders(kioskId: KioskId): Promise<Headers> {
@@ -139,7 +132,10 @@ class KioskPaymentService {
     }
   }
 
-  private async logTransaction(action: string, details: TransactionLog): Promise<void> {
+  private async logTransaction(
+    action: string,
+    details: Omit<TransactionLog, 'timestamp' | 'action'>
+  ): Promise<void> {
     try {
       await fetch('/api/logs', {
         method: 'POST',
@@ -202,6 +198,8 @@ class KioskPaymentService {
     }
 
     try {
+      // Force single-kiosk mode
+      request.kioskId = 'KIOSK1';
       // Validate request
       this.validatePaymentRequest(request);
 

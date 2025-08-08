@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { kioskPayment } from '../services/kioskPayment';
-import type { PaymentResponse } from '../types/kiosk';
+import type { PaymentRequest, PaymentResponse } from '../types/kiosk';
 
 interface CheckoutScreenProps {
   onComplete: () => void;
@@ -38,7 +38,6 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
   const [emailSending, setEmailSending] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
-  const [activeKiosk, setActiveKiosk] = useState<'KIOSK1' | 'KIOSK2'>('KIOSK1');
   const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
 
   // Update time every second
@@ -54,10 +53,10 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
   useEffect(() => {
     return () => {
       if (currentTransactionId) {
-        kioskPayment.cancelPayment(currentTransactionId, activeKiosk).catch(console.error);
+        kioskPayment.cancelPayment(currentTransactionId, 'KIOSK1').catch(console.error);
       }
     };
-  }, [currentTransactionId, activeKiosk]);
+  }, [currentTransactionId]);
 
   const formatDateTime = (date: Date) => {
     const locale = language === 'fr' ? 'fr-CA' : 'en-US';
@@ -130,11 +129,11 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
       setPurchaseError(null);
       setProcessing(true);
 
-      const paymentRequest = {
+      const paymentRequest: PaymentRequest = {
         amount: totals.total,
         currency: 'CAD',
         orderId: `order-${Date.now()}`,
-        kioskId: activeKiosk,
+        kioskId: 'KIOSK1' as const,
         items: cartItems.map(item => ({
           name: item.name,
           quantity: item.quantity,
@@ -155,17 +154,6 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
       } else {
         setPurchaseError(result.error || 'Payment failed');
         console.error('Payment failed:', result.error, result.details);
-        
-        // Try fallback to other kiosk
-        if (activeKiosk === 'KIOSK1') {
-          setActiveKiosk('KIOSK2');
-          // Retry with KIOSK2
-          const fallbackResult = await kioskPayment.initiatePayment({
-            ...paymentRequest,
-            kioskId: 'KIOSK2'
-          });
-          handlePaymentResult(fallbackResult);
-        }
       }
     } catch (error) {
       console.error('Payment processing error:', error);
@@ -338,19 +326,10 @@ const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
                     <span className="arrow">→</span>
                   </button>
                   <div className="kiosk-status">
-                    <div className={`kiosk-indicator ${activeKiosk === 'KIOSK1' ? 'active' : ''}`}>
-                      Kiosk 1 {activeKiosk === 'KIOSK1' && '(Active)'}
-                    </div>
-                    <div className={`kiosk-indicator ${activeKiosk === 'KIOSK2' ? 'active' : ''}`}>
-                      Kiosk 2 {activeKiosk === 'KIOSK2' && '(Active)'}
+                    <div className={`kiosk-indicator active`}>
+                      Kiosk 1 (Active)
                     </div>
                   </div>
-                  <button
-                    onClick={() => setActiveKiosk(activeKiosk === 'KIOSK1' ? 'KIOSK2' : 'KIOSK1')}
-                    className="kiosk-switch-button"
-                  >
-                    Switch Kiosk
-                  </button>
                 </div>
               )}
             </div>
